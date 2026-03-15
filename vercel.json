@@ -1,15 +1,12 @@
 {
-  "version": 2,
-  "builds": [
+  "buildCommand": "composer install --no-dev --optimize-autoloader",
+  "outputDirectory": "public",
+  "installCommand": "composer install --no-dev --optimize-autoloader",
+  "framework": null,
+  "rewrites": [
     {
-      "src": "public/index.php",
-      "use": "@vercel/php"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/public/index.php"
+      "source": "/(.*)",
+      "destination": "/public/index.php"
     }
   ],
   "env": {
