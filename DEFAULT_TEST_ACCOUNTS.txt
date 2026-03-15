@@ -1,0 +1,9 @@
+Default accounts after running migrations and seeder (InitialSeeder):
+
+Seller:
+Email: seller@coircraft.local
+Password: Seller123!
+
+Buyer:
+Email: buyer@coircraft.local
+Password: Buyer123!

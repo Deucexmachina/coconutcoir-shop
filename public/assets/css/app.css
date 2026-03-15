@@ -1,0 +1,473 @@
+:root {
+    --teal-900: #134e4a;
+    --teal-800: #0f766e;
+    --teal-700: #115e59;
+    --teal-600: #14b8a6;
+    --teal-100: #ccfbf1;
+    --teal-50: #f0fdfa;
+    --sand-100: #f6f1e7;
+    --sand-200: #eadfca;
+    --text-main: #134e4a;
+    --success: #1f8a5b;
+    --danger: #b42838;
+}
+
+html,
+body {
+    min-height: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Manrope", "Segoe UI", Tahoma, sans-serif;
+    color: var(--text-main);
+    background: linear-gradient(130deg, #f0fdfa 0%, #ccfbf1 45%, #a7f3d0 100%);
+}
+
+.app-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+a {
+    color: var(--teal-800);
+    text-decoration: none;
+}
+
+.container {
+    width: min(1500px, 96vw);
+    margin: 0 auto;
+}
+
+.site-header {
+    background: linear-gradient(100deg, var(--teal-900), var(--teal-700));
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(19, 78, 74, 0.2);
+}
+
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #fff;
+}
+
+.brand img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 50%;
+    background: #fff;
+    padding: 6px;
+}
+
+.brand-name {
+    font-family: "Plus Jakarta Sans", "Manrope", sans-serif;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+}
+
+.brand-tagline {
+    color: #ccfbf1;
+    font-size: 0.9rem;
+}
+
+.nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.nav-links a,
+.btn-link {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    padding: 0.45rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    border: none;
+}
+
+.nav-links a:hover {
+    background: rgba(255, 255, 255, 0.27);
+}
+
+.site-main {
+    flex: 1;
+    padding: 1.5rem 0 2rem;
+}
+
+.hero {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.4rem;
+    box-shadow: 0 8px 24px rgba(19, 78, 74, 0.12);
+    margin-bottom: 1rem;
+}
+
+.hero h1 {
+    margin: 0 0 0.35rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.panel {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.25rem;
+    box-shadow: 0 7px 20px rgba(19, 78, 74, 0.1);
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: var(--teal-700);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+}
+
+.section-title.featured {
+    font-family: "Comic Sans MS", "Chalkboard SE", "Bradley Hand", cursive;
+    font-size: 1.8rem;
+    background: linear-gradient(45deg, var(--teal-600), var(--teal-700));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 2px 2px 4px rgba(19, 78, 74, 0.1);
+    animation: sparkle 2s ease-in-out infinite alternate;
+}
+
+@keyframes sparkle {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.02); }
+}
+
+.grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.grid.products {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.product-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 0.95rem;
+    border: 1px solid #ccfbf1;
+    display: grid;
+    gap: 0.6rem;
+    box-shadow: 0 10px 24px rgba(19, 78, 74, 0.08);
+}
+
+.product-card img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.product-title {
+    margin: 0;
+    color: #134e4a;
+    font-size: 1.02rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.product-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.price {
+    display: inline-block;
+    padding: 0.35rem 0.55rem;
+    border-radius: 8px;
+    background: linear-gradient(130deg, var(--sand-100), #fff);
+    border: 1px solid var(--sand-200);
+    font-weight: 700;
+    color: var(--teal-700);
+}
+
+.badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 999px;
+    background: var(--teal-100);
+}
+
+.product-card form {
+    grid-template-columns: 86px 1fr;
+    align-items: center;
+}
+
+form {
+    display: grid;
+    gap: 0.75rem;
+}
+
+input,
+select,
+textarea,
+button {
+    font: inherit;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    border: 1px solid #ccfbf1;
+    border-radius: 10px;
+    padding: 0.6rem 0.7rem;
+    background: #f0fdfa;
+}
+
+button,
+.btn {
+    border: none;
+    background: var(--teal-600);
+    color: #fff;
+    padding: 0.55rem 0.9rem;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.btn.secondary {
+    background: var(--teal-600);
+}
+
+.btn.danger {
+    background: var(--danger);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    border-bottom: 1px solid #ccfbf1;
+    text-align: left;
+    padding: 0.6rem;
+    vertical-align: top;
+}
+
+.flash {
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+}
+
+.flash.success {
+    background: #e7f8f0;
+    color: #145537;
+}
+
+.flash.error {
+    background: #ffe8ec;
+    color: #7f1f2a;
+}
+
+.site-footer {
+    background: var(--teal-900);
+    color: #ccfbf1;
+    padding: 1rem 0;
+    margin-top: auto;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(19, 78, 74, 0.55);
+}
+
+.modal-backdrop.is-visible {
+    display: flex;
+}
+
+.modal-card {
+    background: #fff;
+    border-radius: 14px;
+    width: min(420px, 92vw);
+    padding: 1.2rem;
+    box-shadow: 0 16px 36px rgba(19, 78, 74, 0.25);
+}
+
+.modal-card h3 {
+    margin-top: 0;
+    margin-bottom: 0.4rem;
+    font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+.modal-actions {
+    margin-top: 0.9rem;
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.image-preview-box {
+    width: 100%;
+    max-width: 220px;
+    border-radius: 12px;
+    border: 1px solid #ccfbf1;
+    overflow: hidden;
+    background: #f0fdfa;
+}
+
+.image-preview-box img {
+    display: block;
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+}
+
+.muted {
+    color: #14b8a6;
+    font-size: 0.9rem;
+}
+
+.cart-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.cart-toast-content {
+    background: var(--teal-700);
+    color: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 8px 24px rgba(19, 78, 74, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.cart-toast-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.cart-toast-message {
+    flex: 1;
+}
+
+.cart-toast-message strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.cart-toast-actions .btn {
+    background: var(--teal-600);
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.quantity-input {
+    width: 60px;
+    text-align: center;
+    border: 1px solid #ccfbf1;
+    border-radius: 6px;
+    padding: 0.4rem;
+    background: #f0fdfa;
+    height: 40px;
+    box-sizing: border-box;
+}
+
+.quantity-buttons {
+    display: flex;
+    gap: 0.1rem;
+}
+
+.quantity-btn {
+    width: 20px;
+    height: 40px;
+    border: none;
+    background: var(--teal-600);
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    box-sizing: border-box;
+}
+
+.quantity-btn:hover {
+    background: var(--teal-700);
+}
+
+.product-card form {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.product-card button[type="submit"] {
+    height: 40px;
+    box-sizing: border-box;
+    flex: 1;
+    font-size: 0.85rem;
+    padding: 0 0.5rem;
+}
+
+@media (max-width: 700px) {
+    .header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .product-card form {
+        grid-template-columns: 1fr;
+    }
+}
