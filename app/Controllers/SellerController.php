@@ -32,9 +32,12 @@ class SellerController extends BaseController
         $setting = $settingModel->find(1);
 
         $data = [
-            'hero_title' => (string) $this->request->getPost('hero_title'),
-            'hero_subtitle' => (string) $this->request->getPost('hero_subtitle'),
+            'title' => (string) $this->request->getPost('title'),
+            'description' => (string) $this->request->getPost('description'),
+            'hero_title' => (string) $this->request->getPost('title'),
+            'hero_subtitle' => (string) $this->request->getPost('description'),
             'announcement' => (string) $this->request->getPost('announcement'),
+            'hero_background_image' => (string) $this->request->getPost('hero_background_image'),
         ];
 
         if ($setting) {
@@ -53,10 +56,25 @@ class SellerController extends BaseController
         }
 
         $productModel = new ProductModel();
+        $products = $productModel->orderBy('id', 'DESC')->findAll();
+        $selectedProductId = (int) $this->request->getGet('product_id');
+        if ($selectedProductId <= 0 && $products !== []) {
+            $selectedProductId = (int) $products[0]['id'];
+        }
+
+        $selectedProduct = null;
+        foreach ($products as $row) {
+            if ((int) $row['id'] === $selectedProductId) {
+                $selectedProduct = $row;
+                break;
+            }
+        }
 
         return view('seller/inventory', [
             'title' => 'Inventory',
-            'products' => $productModel->orderBy('id', 'DESC')->findAll(),
+            'products' => $products,
+            'selectedProductId' => $selectedProductId,
+            'selectedProduct' => $selectedProduct,
         ]);
     }
 
@@ -70,9 +88,11 @@ class SellerController extends BaseController
         $productModel->insert([
             'name' => (string) $this->request->getPost('name'),
             'description' => (string) $this->request->getPost('description'),
+            'additional_details' => (string) $this->request->getPost('additional_details'),
             'price' => (float) $this->request->getPost('price'),
             'stock' => (int) $this->request->getPost('stock'),
             'image_url' => (string) $this->request->getPost('image_url'),
+            'release_date' => (string) $this->request->getPost('release_date'),
             'is_featured' => $this->request->getPost('is_featured') ? 1 : 0,
             'is_trending' => $this->request->getPost('is_trending') ? 1 : 0,
             'is_best_seller' => $this->request->getPost('is_best_seller') ? 1 : 0,
@@ -92,9 +112,11 @@ class SellerController extends BaseController
         $productModel->update($id, [
             'name' => (string) $this->request->getPost('name'),
             'description' => (string) $this->request->getPost('description'),
+            'additional_details' => (string) $this->request->getPost('additional_details'),
             'price' => (float) $this->request->getPost('price'),
             'stock' => (int) $this->request->getPost('stock'),
             'image_url' => (string) $this->request->getPost('image_url'),
+            'release_date' => (string) $this->request->getPost('release_date'),
             'is_featured' => $this->request->getPost('is_featured') ? 1 : 0,
             'is_trending' => $this->request->getPost('is_trending') ? 1 : 0,
             'is_best_seller' => $this->request->getPost('is_best_seller') ? 1 : 0,

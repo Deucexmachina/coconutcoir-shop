@@ -1,38 +1,34 @@
 # Coconut Coir E-Commerce (CodeIgniter 4) Setup Guide
 
-# Default Accounts Created
-
-# Seller Account:
-# Email: seller@coircraft.local
-# Password: Seller123!
-
-# Buyer Account:
-# Email: buyer@coircraft.local
-# Password: Buyer123!
+## Default Accounts
+- Seller: `seller@coircraft.local` / `Seller123!`
+- Buyer: `buyer@coircraft.local` / `Buyer123!`
 
 ## 1) Prerequisites
-- XAMPP (Apache + MySQL)
-- PHP 8.1+ (XAMPP PHP is fine)
+- PHP `8.2+`
 - Composer
+- MySQL/MariaDB (`5.7+` or `8+`)
+- XAMPP (optional, for local Apache/MySQL)
 
 ## 2) Project Location
-Project root:
 - `c:\Users\dwayn\Downloads\EC+HCI Project\coconutcoir-shop`
 
-Logo used in all pages:
-- Source placeholder: `c:\Users\dwayn\Downloads\EC+HCI Project\logo.png`
-- In-app logo path: `public/assets/images/logo.png`
+## 3) Free Local DB Setup + Port Fix (Windows)
+If port `3306` is already occupied, identify and kill the process first:
 
-## 3) Database Setup (phpMyAdmin via XAMPP)
-1. Open XAMPP Control Panel.
-2. Start `Apache` and `MySQL`.
-3. Open phpMyAdmin: `http://localhost/phpmyadmin`.
-4. Create a new database named `coconutcoir_shop` with collation `utf8mb4_general_ci`.
+```powershell
+netstat -ano | findstr :3306
+taskkill /PID <PID_FROM_NETSTAT> /F
+```
 
-## 4) Configure Environment
+Then:
+1. Start MySQL from XAMPP or your local MySQL service.
+2. Create database `coconutcoir_shop` with collation `utf8mb4_general_ci`.
+
+## 4) Configure `.env`
 From project root:
 1. Copy `env` to `.env`.
-2. Edit `.env` and set:
+2. Set:
 
 ```ini
 CI_ENVIRONMENT = development
@@ -46,9 +42,7 @@ database.default.DBDriver = MySQLi
 database.default.port = 3306
 ```
 
-If your MySQL root user has a password, set it in `database.default.password`.
-
-## 5) Install and Prepare Data
+## 5) Install + Migrate + Seed
 Run in project root:
 
 ```bash
@@ -57,41 +51,173 @@ php spark migrate
 php spark db:seed InitialSeeder
 ```
 
-This creates tables and inserts:
-- Default seller and buyer accounts
-- Initial coconut coir products
-- Initial storefront settings
+If you previously ran old migrations and want a clean schema:
 
-## 6) Run the App
-In project root:
+```bash
+php spark migrate:refresh
+php spark db:seed InitialSeeder
+```
+
+## 6) Database Features Included
+The schema now includes:
+- `products.sold_count`
+- `products.additional_details`
+- `products.release_date`
+- richer `orders` breakdown fields:
+  - `subtotal_amount`
+  - `shipping_fee`
+  - `voucher_code`
+  - `voucher_type`
+  - `voucher_discount_amount`
+  - `shipping_address`
+- `vouchers` table (seeded with):
+  - `FREESHIP` (free shipping)
+  - `LESS5` (5% off)
+  - `LESS10` (10% off)
+- `product_reviews` table (`user_id + product_id` unique)
+- `storefront_settings` supports:
+  - `title`
+  - `description`
+  - `hero_background_image`
+
+## 7) Run Locally
 
 ```bash
 php spark serve
 ```
 
-Open:
-- `http://localhost:8080/`
+Open: `http://localhost:8080/`
 
-## 7) Main Pages Implemented
-### Buyer Side
-- Home: `/`
-- Login: `/login`
-- Register: `/register`
-- Storefront: `/storefront`
-- Products: `/products`
-- Cart: `/cart`
-- Checkout: `/checkout`
-- Transaction history: `/transactions`
-- Profile: `/profile`
+## 8) Feature Checklist
+### Buyer
+- Home page includes:
+  - announcement marquee strip
+  - configurable hero title/description/background image
+  - featured product tiles with quick cart add
+- Product cards show:
+  - stock
+  - sold count
+  - latest review (or `No product reviews`)
+- Product detail page: `/products/{id}`
+- Product detail page can show seller-managed `Details` content
+- Cart shows item images and split layout
+- Checkout has:
+  - item list + order summary in separate containers
+  - address selection (auto-reuse from previous orders)
+  - voucher entry + voucher type details
+  - shipping fee + full breakdown
+  - payment methods: COD, credit/debit card, e-wallet
+- Transactions show item images and review form with 5-star picker
 
-### Seller Side
-- Seller login: `/seller/login`
+### Seller
 - Storefront management: `/seller/storefront`
-- Inventory management: `/seller/inventory`
-- Reports (daily/monthly sales + inventory report): `/seller/reports`
+  - configurable `Title`, `Description`, `Hero Background Image URL`, and `Announcement`
+- Inventory: `/seller/inventory`
+  - create/edit products with `Additional Details` and `Release Date`
+- Reports: `/seller/reports`
 
-## 8) Notes
-- All pages include the group name and logo.
-- All pages include footer disclaimer:
+## 8.1) New Migration Reminder
+If you already migrated before these latest visual/data updates, run:
+
+```bash
+php spark migrate
+```
+
+If your schema is old or inconsistent:
+
+```bash
+php spark migrate:refresh
+php spark db:seed InitialSeeder
+```
+
+## 9) Free Deployment Recommendation (CI4)
+### Why not Vercel (for this project)?
+Vercel can run PHP with custom serverless setups, but standard CI4 apps are not a direct fit for its default framework pipeline and can be more fragile for full-session/database app behavior.
+
+### Recommended: Railway (best fit among common free student options)
+Railway runs this CI4 app as a normal PHP web process and is simpler for this architecture.
+
+> Note: Railway free usage may be credit-based depending on current plan policies.
+
+### Railway Steps (Detailed)
+
+#### A) Push this project to GitHub (first time)
+In project root:
+
+```bash
+git init
+git add .
+git commit -m "Initial Coconut Coir shop commit"
+git branch -M main
+git remote add origin https://github.com/<your-username>/<your-repo>.git
+git push -u origin main
+```
+
+If the repo already exists locally (most common), use:
+
+```bash
+git add .
+git commit -m "Update Coconut Coir shop"
+git push
+```
+
+#### B) Push future code updates to GitHub
+Every time you change code:
+
+```bash
+git add .
+git commit -m "Describe your change"
+git push
+```
+
+Railway auto-redeploys after each push to the connected branch.
+
+#### C) Create Railway project + services
+1. Login to Railway.
+2. Click `New Project`.
+3. Choose `Deploy from GitHub repo`.
+4. Select this repository.
+5. In the same Railway project, click `New` -> `Database` -> `MySQL`.
+
+#### D) Connect app service to MySQL values
+In Railway:
+1. Open your MySQL service.
+2. Copy connection values from its `Variables`/`Connect` tab.
+3. Open your web app service -> `Variables`.
+4. Add:
+   - `APP_ENV=production`
+   - `CI_ENVIRONMENT=production`
+   - `APP_BASE_URL=https://<your-railway-domain>`
+   - `DATABASE_HOST=<mysql-host>`
+   - `DATABASE_NAME=<mysql-database>`
+   - `DATABASE_USER=<mysql-user>`
+   - `DATABASE_PASSWORD=<mysql-password>`
+   - `DATABASE_PORT=<mysql-port>`
+
+#### E) Deploy app
+- Railway uses `railway.toml` in this repo.
+- Start command is:
+  - `php spark serve --host 0.0.0.0 --port $PORT`
+
+#### F) Run migrations and seed in Railway shell
+1. Open the app service in Railway.
+2. Open `Shell`.
+3. Run:
+
+```bash
+php spark migrate
+php spark db:seed InitialSeeder
+```
+
+#### G) Verify production
+1. Open app URL from Railway (`<your-railway-domain>`).
+2. Login with seeded accounts.
+3. Confirm:
+   - products load
+   - cart/checkout works
+   - order placement works
+   - seller pages load
+
+## 10) Notes
+- Footer disclaimer remains:
   - `For educational purposes only, and no copyright infringement is intended.`
-- Theme color scheme uses navy-blue styling.

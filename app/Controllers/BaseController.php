@@ -49,7 +49,9 @@ abstract class BaseController extends Controller
     {
         $user = $this->currentUser();
         if ($user === null || $user['role'] !== 'buyer') {
-            return redirect()->to('/login')->with('error', 'Please log in as buyer first.');
+            $target = current_url();
+            $suffix = $target !== '' ? '?redirect_to=' . rawurlencode($target) : '';
+            return redirect()->to('/login' . $suffix)->with('error', 'Please log in as buyer first.');
         }
 
         return null;

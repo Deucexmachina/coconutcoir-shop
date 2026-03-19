@@ -2,18 +2,28 @@
 
 namespace App\Controllers;
 
+use App\Models\CartItemModel;
+use App\Models\ProductModel;
 use App\Models\UserModel;
 
 class AuthController extends BaseController
 {
     public function login(): string
     {
-        return view('auth/login', ['title' => 'Buyer Login', 'role' => 'buyer']);
+        return view('auth/login', [
+            'title' => 'Login',
+            'role' => 'buyer',
+            'redirect_to' => (string) $this->request->getGet('redirect_to'),
+        ]);
     }
 
     public function sellerLogin(): string
     {
-        return view('auth/login', ['title' => 'Seller Login', 'role' => 'seller']);
+        return view('auth/login', [
+            'title' => 'Login',
+            'role' => 'seller',
+            'redirect_to' => '',
+        ]);
     }
 
     public function register(): string
@@ -65,11 +75,58 @@ class AuthController extends BaseController
         unset($user['password_hash']);
         $this->session->set('user', $user);
 
+        if ($role === 'buyer') {
+            $guestCart = $this->session->get('guest_cart');
+            if (is_array($guestCart) && $guestCart !== []) {
+                $cartModel = new CartItemModel();
+                $productModel = new ProductModel();
+
+                foreach ($guestCart as $productId => $qty) {
+                    $pid = (int) $productId;
+                    $qty = max(1, (int) $qty);
+                    if ($pid <= 0) {
+                        continue;
+                    }
+
+                    $product = $productModel->find($pid);
+                    if (! $product || (int) $product['is_active'] !== 1) {
+                        continue;
+                    }
+
+                    $existing = $cartModel
+                        ->where('user_id', $user['id'])
+                        ->where('product_id', $pid)
+                        ->first();
+                    $existingQty = $existing ? (int) $existing['quantity'] : 0;
+                    $newQty = min((int) $product['stock'], $existingQty + $qty);
+                    if ($newQty < 1) {
+                        continue;
+                    }
+
+                    if ($existing) {
+                        $cartModel->update($existing['id'], ['quantity' => $newQty]);
+                    } else {
+                        $cartModel->insert([
+                            'user_id' => $user['id'],
+                            'product_id' => $pid,
+                            'quantity' => $newQty,
+                        ]);
+                    }
+                }
+
+                $this->session->remove('guest_cart');
+            }
+        }
+
         if ($role === 'seller') {
             return redirect()->to('/seller/storefront')->with('success', 'Welcome back, seller.');
         }
 
-        return redirect()->to('/storefront')->with('success', 'Welcome back.');
+        $redirectTo = (string) $this->request->getPost('redirect_to');
+        if ($redirectTo === '') {
+            $redirectTo = '/storefront';
+        }
+        return redirect()->to($redirectTo)->with('success', 'Welcome back.');
     }
 
     public function logout()

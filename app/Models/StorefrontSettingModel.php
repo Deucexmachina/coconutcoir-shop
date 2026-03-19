@@ -10,8 +10,11 @@ class StorefrontSettingModel extends Model
     protected $primaryKey = 'id';
     protected $returnType = 'array';
     protected $allowedFields = [
+        'title',
+        'description',
         'hero_title',
         'hero_subtitle',
         'announcement',
+        'hero_background_image',
     ];
 }

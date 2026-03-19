@@ -16,6 +16,7 @@ $routes->get('/logout', 'AuthController::logout');
 
 $routes->get('/storefront', 'BuyerController::storefront');
 $routes->get('/products', 'BuyerController::products');
+$routes->get('/products/(:num)', 'BuyerController::product/$1');
 $routes->get('/cart', 'BuyerController::cart');
 $routes->post('/cart/add/(:num)', 'BuyerController::addToCart/$1');
 $routes->post('/cart/update/(:num)', 'BuyerController::updateCart/$1');
@@ -23,6 +24,7 @@ $routes->post('/cart/remove/(:num)', 'BuyerController::removeCart/$1');
 $routes->get('/checkout', 'BuyerController::checkout');
 $routes->post('/checkout', 'BuyerController::placeOrder');
 $routes->get('/transactions', 'BuyerController::transactions');
+$routes->post('/reviews/submit/(:num)', 'BuyerController::submitReview/$1');
 $routes->get('/profile', 'BuyerController::profile');
 
 $routes->get('/seller/storefront', 'SellerController::storefront');

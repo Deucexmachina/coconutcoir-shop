@@ -17,7 +17,7 @@ class Home extends BaseController
         return view('home/index', [
             'title' => 'Home',
             'setting' => $setting,
-            'featured' => $productModel->where('is_active', 1)->where('is_featured', 1)->findAll(4),
+            'featured' => $productModel->where('is_active', 1)->where('is_featured', 1)->orderBy('id', 'DESC')->findAll(6),
         ]);
     }
 }
