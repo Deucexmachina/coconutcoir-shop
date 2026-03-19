@@ -194,22 +194,43 @@ In Railway:
    - `DATABASE_PASSWORD=<mysql-password>`
    - `DATABASE_PORT=<mysql-port>`
 
+> You can use phpMyAdmin, MySQL Workbench, DBeaver, or any SQL client you prefer. Railway only needs valid MySQL connection values; the GUI tool does not matter.
+
 #### E) Deploy app
 - Railway uses `railway.toml` in this repo.
 - Start command is:
-  - `php spark serve --host 0.0.0.0 --port $PORT`
+  - `php -S 0.0.0.0:$PORT -t public`
 
-#### F) Run migrations and seed in Railway shell
+#### F) Run migrations safely in Railway shell
 1. Open the app service in Railway.
 2. Open `Shell`.
-3. Run:
+3. If this is an existing database with manual image URL fixes, run only:
+
+```bash
+php spark migrate
+```
+
+4. Only for a brand-new/empty database, run:
 
 ```bash
 php spark migrate
 php spark db:seed InitialSeeder
 ```
 
-#### G) Verify production
+> Avoid `php spark migrate:refresh` on production/existing data because it drops and recreates tables, which will remove manual product edits (including image URLs).
+
+#### G) If Railway shows `network > healthcheck failure`
+1. Confirm app variables are set on the web service:
+   - `APP_ENV=production`
+   - `CI_ENVIRONMENT=production`
+   - `APP_BASE_URL=https://<your-railway-domain>`
+   - `DATABASE_HOST`, `DATABASE_NAME`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_PORT`
+2. Confirm Railway uses the command in `railway.toml`:
+   - `php -S 0.0.0.0:$PORT -t public`
+3. Redeploy after saving variables.
+4. Check deployment logs for DB connection errors (wrong host/user/password/port are the most common reason for failing `/` healthcheck).
+
+#### H) Verify production
 1. Open app URL from Railway (`<your-railway-domain>`).
 2. Login with seeded accounts.
 3. Confirm:
