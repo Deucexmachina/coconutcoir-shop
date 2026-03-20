@@ -5,6 +5,8 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+$routes->get('/health', static fn () => service('response')->setStatusCode(200)->setBody('ok'));
+
 $routes->get('/', 'Home::index');
 
 $routes->get('/login', 'AuthController::login');
