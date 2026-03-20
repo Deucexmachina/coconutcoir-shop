@@ -130,19 +130,59 @@ php spark migrate:refresh
 php spark db:seed InitialSeeder
 ```
 
-## 9) Free Deployment Recommendation (CI4)
-### Why not Vercel (for this project)?
-Vercel can run PHP with custom serverless setups, but standard CI4 apps are not a direct fit for its default framework pipeline and can be more fragile for full-session/database app behavior.
+## 9) Default Workflow (XAMPP + phpMyAdmin + `php spark serve`)
+Use this as the official default setup for development and demos.
 
-### Recommended: Railway (best fit among common free student options)
-Railway runs this CI4 app as a normal PHP web process and is simpler for this architecture.
+1. Start Apache and MySQL in XAMPP.
+2. In phpMyAdmin, create database `coconutcoir_shop` with collation `utf8mb4_general_ci`.
+3. In project root, ensure `.env` has local DB values:
 
-> Note: Railway free usage may be credit-based depending on current plan policies.
+```ini
+CI_ENVIRONMENT = development
+app.baseURL = 'http://localhost:8080/'
 
-### Railway Steps (Detailed)
+database.default.hostname = localhost
+database.default.database = coconutcoir_shop
+database.default.username = root
+database.default.password =
+database.default.DBDriver = MySQLi
+database.default.port = 3306
+```
 
-#### A) Push this project to GitHub (first time)
-In project root:
+4. Install dependencies and build schema/data:
+
+```bash
+composer install
+php spark migrate
+php spark db:seed InitialSeeder
+```
+
+5. Run app:
+
+```bash
+php spark serve
+```
+
+6. Open `http://localhost:8080/`.
+
+## 10) Fastest Free Deployment Option (Recommended)
+### Recommended: Railway + Railway MySQL + MySQL Workbench Import
+Why this is the best fit for this project now:
+- standard PHP app deployment from GitHub
+- managed MySQL in the same project
+- import `.sql` from local phpMyAdmin using MySQL Workbench
+- quick setup for school projects
+
+### A) Push project to GitHub
+If your repo is already connected:
+
+```bash
+git add .
+git commit -m "Update setup and deployment"
+git push
+```
+
+If this is first push:
 
 ```bash
 git init
@@ -153,92 +193,102 @@ git remote add origin https://github.com/<your-username>/<your-repo>.git
 git push -u origin main
 ```
 
-If the repo already exists locally (most common), use:
-
-```bash
-git add .
-git commit -m "Update Coconut Coir shop"
-git push
-```
-
-#### B) Push future code updates to GitHub
-Every time you change code:
-
-```bash
-git add .
-git commit -m "Describe your change"
-git push
-```
-
-Railway auto-redeploys after each push to the connected branch.
-
-#### C) Create Railway project + services
-1. Login to Railway.
+### B) Create Railway services
+1. Log in to Railway.
 2. Click `New Project`.
-3. Choose `Deploy from GitHub repo`.
-4. Select this repository.
-5. In the same Railway project, click `New` -> `Database` -> `MySQL`.
+3. Click `Deploy from GitHub repo` and select this repository.
+4. In the same project, click `New` -> `Database` -> `MySQL`.
+5. Wait until both services are marked healthy.
 
-#### D) Connect app service to MySQL values
-In Railway:
-1. Open your MySQL service.
-2. Copy connection values from its `Variables`/`Connect` tab.
-3. Open your web app service -> `Variables`.
-4. Add:
-   - `APP_ENV=production`
-   - `CI_ENVIRONMENT=production`
-   - `APP_BASE_URL=https://<your-railway-domain>`
-   - `DATABASE_HOST=<mysql-host>`
-   - `DATABASE_NAME=<mysql-database>`
-   - `DATABASE_USER=<mysql-user>`
-   - `DATABASE_PASSWORD=<mysql-password>`
-   - `DATABASE_PORT=<mysql-port>`
+### C) Set app variables on Railway web service
+Open the web service -> `Variables` and add:
 
-> You can use phpMyAdmin, MySQL Workbench, DBeaver, or any SQL client you prefer. Railway only needs valid MySQL connection values; the GUI tool does not matter.
-
-#### E) Deploy app
-- Railway uses `railway.toml` in this repo.
-- Start command is:
-  - `php -S 0.0.0.0:$PORT -t public`
-
-#### F) Run migrations safely in Railway shell
-1. Open the app service in Railway.
-2. Open `Shell`.
-3. If this is an existing database with manual image URL fixes, run only:
-
-```bash
-php spark migrate
+```ini
+APP_ENV=production
+CI_ENVIRONMENT=production
+APP_BASE_URL=https://<your-railway-domain>
+DATABASE_HOST=${{MySQL.MYSQLHOST}}
+DATABASE_NAME=${{MySQL.MYSQLDATABASE}}
+DATABASE_USER=${{MySQL.MYSQLUSER}}
+DATABASE_PASSWORD=${{MySQL.MYSQLPASSWORD}}
+DATABASE_PORT=${{MySQL.MYSQLPORT}}
 ```
 
-4. Only for a brand-new/empty database, run:
+Important:
+- `APP_ENV` and `CI_ENVIRONMENT` use literal value `production`.
+- `DATABASE_*` use references so they stay in sync with the MySQL service.
 
-```bash
-php spark migrate
-php spark db:seed InitialSeeder
-```
+### D) Export `.sql` from local phpMyAdmin
+1. Open local phpMyAdmin (XAMPP).
+2. Select database `coconutcoir_shop`.
+3. Click `Export`.
+4. Choose `Quick` + `SQL`.
+5. Download file, for example: `coconutcoir_shop.sql`.
 
-> Avoid `php spark migrate:refresh` on production/existing data because it drops and recreates tables, which will remove manual product edits (including image URLs).
+### E) Import `.sql` into Railway MySQL using MySQL Workbench
+#### 1) Get Railway public connection values
+Open Railway MySQL service -> `Connect` tab -> `Public Network` and copy:
+- host (example: `autorack.proxy.rlwy.net`)
+- port (example: `50798`)
+- username (usually `root`)
+- password
+- database name (usually `railway`)
 
-#### G) If Railway shows `network > healthcheck failure`
-1. Confirm app variables are set on the web service:
-   - `APP_ENV=production`
-   - `CI_ENVIRONMENT=production`
-   - `APP_BASE_URL=https://<your-railway-domain>`
-   - `DATABASE_HOST`, `DATABASE_NAME`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_PORT`
-2. Confirm Railway uses the command in `railway.toml`:
-   - `php -S 0.0.0.0:$PORT -t public`
-3. Redeploy after saving variables.
-4. Check deployment logs for DB connection errors (wrong host/user/password/port are the most common reason for failing `/` healthcheck).
+You can also copy from MySQL service `Variables`:
+- host: `MYSQL_PUBLIC_URL` (parse host/port) or use Connect tab directly
+- user: `MYSQLUSER`
+- password: `MYSQLPASSWORD`
+- database: `MYSQLDATABASE`
 
-#### H) Verify production
-1. Open app URL from Railway (`<your-railway-domain>`).
-2. Login with seeded accounts.
-3. Confirm:
-   - products load
-   - cart/checkout works
-   - order placement works
-   - seller pages load
+#### 2) Create connection in MySQL Workbench
+Open MySQL Workbench -> click `+` next to `MySQL Connections`.
 
-## 10) Notes
+Fill fields exactly:
+- `Connection Name`: `Railway MySQL`
+- `Connection Method`: `Standard (TCP/IP)`
+- `Hostname`: `<railway-public-host>`
+- `Port`: `<railway-public-port>`
+- `Username`: `<railway-mysql-user>`
+- `Password`: click `Store in Vault...` and paste password
+- `Default Schema`: `<railway-database-name>`
+
+Click `Test Connection`.
+If success, click `OK` to save.
+
+#### 3) Run SQL import
+1. Open the saved `Railway MySQL` connection.
+2. Go to `Server` -> `Data Import`.
+3. Choose `Import from Self-Contained File` and select `coconutcoir_shop.sql`.
+4. Under `Default Target Schema`, choose Railway DB (usually `railway`).
+5. Click `Start Import`.
+6. Refresh `Schemas` and verify tables exist.
+
+Connection mapping summary:
+- `Hostname` -> Railway `Connect` host (`autorack.proxy...`)
+- `Port` -> Railway `Connect` port (`xxxxx`)
+- `Username` -> Railway `MYSQLUSER`
+- `Password` -> Railway `MYSQLPASSWORD`
+- `Default Schema` -> Railway `MYSQLDATABASE`
+
+### F) Deploy and verify app
+1. Trigger deploy (or push new commit).
+2. Open deployment logs and ensure no DB connection errors.
+3. Open app URL from Railway.
+4. Login using seeded accounts.
+5. Verify product listing, cart, checkout, seller pages.
+
+### G) Troubleshooting
+1. App cannot connect to DB:
+   - Confirm DB variables are on the web service (not only MySQL service).
+   - Confirm `DATABASE_*` variables are set to `${{MySQL....}}` references.
+2. Workbench cannot connect:
+   - Use `Public Network` host/port, not `mysql.railway.internal`.
+   - Re-check password and username.
+3. Imported tables not seen by app:
+   - Ensure Workbench imported into schema matching `DATABASE_NAME`.
+4. App deployed but blank/errors:
+   - Confirm `APP_BASE_URL` is exact Railway domain with `https://`.
+
+## 11) Notes
 - Footer disclaimer remains:
   - `For educational purposes only, and no copyright infringement is intended.`
