@@ -199,4 +199,14 @@ class App extends BaseConfig
      * @see http://www.w3.org/TR/CSP/
      */
     public bool $CSPEnabled = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $envBaseUrl = getenv('APP_BASE_URL');
+        if (is_string($envBaseUrl) && $envBaseUrl !== '') {
+            $this->baseURL = rtrim($envBaseUrl, '/') . '/';
+        }
+    }
 }
